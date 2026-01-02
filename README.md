@@ -36,7 +36,7 @@ Go to **Tools** > **Install Packages** > **Install from:** Package Archive Files
 Unzip the `ClimateNAr.zip` file directly into your R library folder.
 
 ## System Requirements
-*   **R:** Version 3.10 or higher.
+*   **R:** Version 4.4.2 or higher.
 *   **Dependencies:** `data.table`, `terra`, `readr`.
 *   **ClimateBC or ClimateNA:** Must be installed for CMD Line access.
 

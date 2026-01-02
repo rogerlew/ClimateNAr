@@ -6,6 +6,7 @@
 **Author:** Tongli Wang <Tongli.Wang@ubc.ca>  
 **Maintainer:** Tongli Wang <Tongli.Wang@ubc.ca>  
 **URL:** https://climatena.ca/downloads/ClimateNAr.zip  
+**System Requirements:** R 4.4.2 or higher (package built with R 4.4.2)  
 
 ## Description
 The R version of ClimateNA has the following advantages:
@@ -289,4 +290,3 @@ head(bestMod$list,10)
 bestMod <- varScan(x, y, varComb=2, smVar=10,IR=F,title='Y values');
 head(bestMod$list,10)
 ```
-
