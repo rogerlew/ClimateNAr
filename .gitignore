@@ -4,5 +4,3 @@
 .Ruserdata
 .DS_Store
 *.Rproj
-# Exclude file > 100MB to avoid GitHub rejection
-data/baseline/dv_bs.rda
