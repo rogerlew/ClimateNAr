@@ -85,12 +85,15 @@ library(readr)
 }
 
 .get_query_param <- function(request, key, default = NULL) {
-  if (!is.null(request$query) && !is.null(request$query[[key]])) {
-    return(request$query[[key]])
+  # Try RestRserve's get_param_query method first
+  val <- tryCatch(request$get_param_query(key), error = function(e) NULL)
+  if (!is.null(val)) return(val)
+
+  # Fallback to parameters_query list
+  if (!is.null(request$parameters_query) && !is.null(request$parameters_query[[key]])) {
+    return(request$parameters_query[[key]])
   }
-  if (!is.null(request$parameters) && !is.null(request$parameters[[key]])) {
-    return(request$parameters[[key]])
-  }
+
   default
 }
 
@@ -157,17 +160,21 @@ library(readr)
   if (is.matrix(result) || is.array(result)) {
     result <- as.data.frame(result)
   }
-  if (is.data.frame(result)) {
+
+  # ClimateNAr may write output to CSV files - prefer reading those
+  out_files <- list.files(tmp_dir, pattern = "\\.csv$", full.names = TRUE)
+  out_files <- out_files[normalizePath(out_files) != normalizePath(input_file)]
+
+  if (length(out_files) > 0) {
+    out_file <- out_files[which.max(file.info(out_files)$mtime)]
+    return(readr::read_csv(out_file, show_col_types = FALSE, progress = FALSE))
+  }
+
+  if (is.data.frame(result) && "Tmin01" %in% names(result)) {
     return(result)
   }
 
-  out_files <- list.files(tmp_dir, pattern = "\\.csv$", full.names = TRUE)
-  out_files <- out_files[normalizePath(out_files) != normalizePath(input_file)]
-  if (length(out_files) == 0) {
-    stop("ClimateNAr returned no output files.")
-  }
-  out_file <- out_files[which.max(file.info(out_files)$mtime)]
-  readr::read_csv(out_file, show_col_types = FALSE, progress = FALSE)
+  stop("ClimateNAr returned no output files.")
 }
 
 .order_month_cols <- function(cols) {
@@ -243,5 +250,6 @@ library(readr)
 
 .handle_error <- function(response, status, code, message, details = list()) {
   response$set_status_code(status)
-  list(error = list(code = code, message = message, details = details))
+  response$set_body(list(error = list(code = code, message = message, details = details)))
+  invisible(NULL)
 }
